@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Kriollo Grid - Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fdfdfd;
+            color: #222;
+            text-align: center;
+            padding: 30px;
+        }
+        h1 {
+            color: #004080;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 2px solid #ccc;
+            padding: 20px;
+            width: 120px;
+            height: 100px;
+            vertical-align: middle;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 250px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background: #004080;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .filled {
+            background-color: #dff0d8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kriollo Grid (Demo)</h1>
+    <p>Ingresa un jugador que cumpla con el cruce (fila y columna):</p>
+    <table id="grid">
+        <tr>
+            <th></th>
+            <th>U. de Chile</th>
+            <th>Audax</th>
+            <th>Argentino</th>
+        </tr>
+        <tr>
+            <th>U. Católica</th>
+            <td data-key="uc_udechile"></td>
+            <td data-key="uc_audax"></td>
+            <td data-key="uc_arg"></td>
+        </tr>
+        <tr>
+            <th>Everton</th>
+            <td data-key="everton_udechile"></td>
+            <td data-key="everton_audax"></td>
+            <td data-key="everton_arg"></td>
+        </tr>
+        <tr>
+            <th>Colo Colo</th>
+            <td data-key="colo_udechile"></td>
+            <td data-key="colo_audax"></td>
+            <td data-key="colo_arg"></td>
+        </tr>
+    </table>
+
+    <input type="text" id="playerInput" placeholder="Ej: Luis Pedro Figueroa">
+    <br>
+    <button onclick="checkPlayer()">Ingresar jugador</button>
+
+    <p id="message"></p>
+
+    <script>
+        const validPlayers = {
+            "uc_udechile": ["luis pedro figueroa"],
+            "uc_audax": ["diego buonanotte"],
+            "uc_arg": ["fernando zampedri"],
+            "everton_udechile": ["johnny herrera"],
+            "everton_audax": ["bryan carvallo"],
+            "everton_arg": ["ezequiel miralles"],
+            "colo_udechile": ["matías zaldivia"],
+            "colo_audax": ["esteban paredes"],
+            "colo_arg": ["leonardo gil"]
+        };
+
+        let filledCells = {};
+
+        function checkPlayer() {
+            const input = document.getElementById("playerInput");
+            const player = input.value.trim().toLowerCase();
+            let found = false;
+
+            for (const key in validPlayers) {
+                if (validPlayers[key].includes(player) && !filledCells[key]) {
+                    const cell = document.querySelector(`[data-key="${key}"]`);
+                    cell.innerText = player;
+                    cell.classList.add("filled");
+                    filledCells[key] = true;
+                    document.getElementById("message").innerText = `✅ ${player} agregado correctamente`;
+                    input.value = "";
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                document.getElementById("message").innerText = `❌ ${player} no es válido o ya está en uso.`;
+            }
+
+            if (Object.keys(filledCells).length === 9) {
+                document.getElementById("message").innerText = "🎉 ¡Grid completado!";
+            }
+        }
+    </script>
+</body>
+</html>
