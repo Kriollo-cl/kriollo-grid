@@ -81,7 +81,24 @@
     <button onclick="checkPlayer()">Ingresar jugador</button>
 
     <p id="message"></p>
+    
+<script>
+    let datosBase = [];
 
+    async function cargarDatos() {
+      const respuesta = await fetch(https://docs.google.com/spreadsheets/d/e/2PACX-1vT32rOLsUW8yxWSoKu_QXVt6uTufTmWTmgCQQ3eRkDfp8BU8e40l9-HCi5YwRJfVw/pub?gid=1432424498&single=true&output=csv);
+      const texto = await respuesta.text();
+      const filas = texto.trim().split('\n').slice(1);
+      
+      filas.forEach(fila => {
+        const [jugador, nacionalidad, club] = fila.split(',');
+        datosBase.push({ jugador: jugador.toLowerCase(), nacionalidad: nacionalidad.toLowerCase(), club: club.toLowerCase() });
+      });
+      console.log('Base cargada:', datosBase);
+    }
+
+    window.onload = cargarDatos;
+</script>
     <script>
         const validPlayers = {
             "uc_udechile": ["luis pedro figueroa"],
@@ -95,34 +112,54 @@
             "colo_arg": ["leonardo gil"]
         };
 
-        let filledCells = {};
+<script>
+let filledCells = {};
 
-        function checkPlayer() {
-            const input = document.getElementById("playerInput");
-            const player = input.value.trim().toLowerCase();
-            let found = false;
+function checkPlayer() {
+    const input = document.getElementById("playerInput");
+    const player = input.value.trim().toLowerCase();
+    const gridKeys = {
+        "uc_udechile": ["universidad católica", "universidad de chile"],
+        "uc_audax": ["universidad católica", "audax italiano"],
+        "uc_arg": ["universidad católica", "argentina"],
+        "everton_udechile": ["everton", "universidad de chile"],
+        "everton_audax": ["everton", "audax italiano"],
+        "everton_arg": ["everton", "argentina"],
+        "colo_udechile": ["colo colo", "universidad de chile"],
+        "colo_audax": ["colo colo", "audax italiano"],
+        "colo_arg": ["colo colo", "argentina"]
+    };
 
-            for (const key in validPlayers) {
-                if (validPlayers[key].includes(player) && !filledCells[key]) {
-                    const cell = document.querySelector(`[data-key="${key}"]`);
-                    cell.innerText = player;
-                    cell.classList.add("filled");
-                    filledCells[key] = true;
-                    document.getElementById("message").innerText = `✅ ${player} agregado correctamente`;
-                    input.value = "";
-                    found = true;
-                    break;
-                }
-            }
+    let found = false;
 
-            if (!found) {
-                document.getElementById("message").innerText = `❌ ${player} no es válido o ya está en uso.`;
-            }
+    for (const key in gridKeys) {
+        const [clubFila, clubColumna] = gridKeys[key];
 
-            if (Object.keys(filledCells).length === 9) {
-                document.getElementById("message").innerText = "🎉 ¡Grid completado!";
+        if (!filledCells[key]) {
+            const cumpleFila = datosBase.some(j => j.jugador === player && (j.club === clubFila || j.nacionalidad === clubFila));
+            const cumpleColumna = datosBase.some(j => j.jugador === player && (j.club === clubColumna || j.nacionalidad === clubColumna));
+
+            if (cumpleFila && cumpleColumna) {
+                const cell = document.querySelector(`[data-key="${key}"]`);
+                cell.innerText = input.value.trim();
+                cell.classList.add("filled");
+                filledCells[key] = true;
+                document.getElementById("message").innerText = `✅ ${input.value.trim()} agregado correctamente`;
+                input.value = "";
+                found = true;
+                break;
             }
         }
-    </script>
+    }
+
+    if (!found) {
+        document.getElementById("message").innerText = `❌ ${input.value.trim()} no cumple los requisitos o ya está en uso.`;
+    }
+
+    if (Object.keys(filledCells).length === 9) {
+        document.getElementById("message").innerText = "🎉 ¡Grid completado!";
+    }
+}
+</script>
 </body>
 </html>
